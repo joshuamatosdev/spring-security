@@ -1,0 +1,24 @@
+spring:
+  #Set docker lifecycle management to start_only
+  docker:
+    compose:
+      lifecycle-management: start_only
+  #Enable virtual threads - Java 21
+  threads:
+    virtual:
+      enabled: true
+  #Configure Spring Security Resource Server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/student-keycloak
+          jwk-set-uri: http://localhost:8180/realms/student-keycloak/protocol/openid-connect/certs
+#Add logging for debugging
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2.client: DEBUG
+    org.springframework.security.oauth2.server.resource: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+    

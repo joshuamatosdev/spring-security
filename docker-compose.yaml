@@ -1,0 +1,31 @@
+services:
+  student_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      
+  keycloak:
+    
+    restart: always
+    image: quay.io/keycloak/keycloak:22.0.0
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - DB_VENDOR=h2
+#    volumes:
+#      - ./app_config/student-keycloak-realm.json:/opt/keycloak/data/import/student-keycloak-realm.json
+    ports:
+      - "8180:8080"
+    command:
+      - start-dev --import-realm
+      
+volumes:
+  postgres-data:
