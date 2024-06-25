@@ -32,7 +32,7 @@ public class StudentController {
         return "Hello, User!";
     }
     
-    @RequestMapping("/api/all")
+    @RequestMapping("/api/authenticated")
     public String helloAll() {
         return "Hello, All!";
     }

@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -57,10 +59,11 @@ public class SecurityConfig {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
         jwtConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-            log.info("Audiences: {}", jwt.getAudience());
-            List<String> roles = (List<String>) realmAccess.get("roles");
             printDecodedJWT(jwt);
+            
+            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+            List<String> roles = (List<String>) realmAccess.get("roles");
+            
             return roles.stream()
                     .filter(Role::isValid)
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase().replace(" ", "_")))
@@ -68,10 +71,13 @@ public class SecurityConfig {
         });
         return jwtConverter;
     }
+    
 
     void printDecodedJWT(Jwt jwt) {
         try {
-            log.info("JWT Token, {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jwt));
+            log.info("JWT Token, {}", objectMapper
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(jwt));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

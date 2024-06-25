@@ -22,7 +22,7 @@ const oidcConfig = {
     post_logout_redirect_uri: "http://localhost:8080/",
     filterProtocolClaims: true,
     loadUserInfo: true,
-    onSigninCallback: onSignInCallback,
+    onSignInCallback: onSignInCallback,
 };
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
