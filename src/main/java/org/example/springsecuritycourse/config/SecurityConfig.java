@@ -53,6 +53,8 @@ public class SecurityConfig {
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter)))
                 .build();
+        
+
     }
 
     @Bean
