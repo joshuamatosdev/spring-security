@@ -14,8 +14,10 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job create(Job job) {
-        job.setCreatedAt(LocalDateTime.now());
-        job.setUpdatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        job.setId(null);
+        job.setCreatedAt(now);
+        job.setUpdatedAt(now);
         return jobRepository.save(job);
     }
 

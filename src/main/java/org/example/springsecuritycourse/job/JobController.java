@@ -25,38 +25,45 @@ public class JobController {
     private final JobService jobService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<Job> create(@Valid @RequestBody Job job) {
-        Job created = jobService.create(job);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<JobResponse> create(@Valid @RequestBody JobCreateRequest request) {
+        Job created = jobService.create(request.toEntity());
+        return ResponseEntity.status(HttpStatus.CREATED).body(JobResponse.from(created));
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<Job>> findAll() {
-        return ResponseEntity.ok(jobService.findAll());
+    public ResponseEntity<List<JobResponse>> findAll() {
+        List<JobResponse> jobs = jobService.findAll().stream()
+                .map(JobResponse::from)
+                .toList();
+        return ResponseEntity.ok(jobs);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Job> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(jobService.findById(id));
+    public ResponseEntity<JobResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(JobResponse.from(jobService.findById(id)));
     }
 
     @GetMapping("/status")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<Job>> findByStatus(@RequestParam JobStatus status) {
-        return ResponseEntity.ok(jobService.findByStatus(status));
+    public ResponseEntity<List<JobResponse>> findByStatus(@RequestParam JobStatus status) {
+        List<JobResponse> jobs = jobService.findByStatus(status).stream()
+                .map(JobResponse::from)
+                .toList();
+        return ResponseEntity.ok(jobs);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<Job> update(@PathVariable Long id, @Valid @RequestBody Job job) {
-        return ResponseEntity.ok(jobService.update(id, job));
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<JobResponse> update(@PathVariable Long id, @Valid @RequestBody JobCreateRequest request) {
+        Job updated = jobService.update(id, request.toEntity());
+        return ResponseEntity.ok(JobResponse.from(updated));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         jobService.delete(id);
         return ResponseEntity.noContent().build();

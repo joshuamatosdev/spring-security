@@ -3,9 +3,9 @@ export type JobStatus = 'OPEN' | 'CLOSED' | 'DRAFT';
 export interface Job {
     id?: number;
     title: string;
-    description: string;
-    company: string;
-    location: string;
+    description: string | null;
+    company: string | null;
+    location: string | null;
     status: JobStatus;
     createdAt?: string;
     updatedAt?: string;

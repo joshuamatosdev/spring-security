@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type ChangeEvent, type FormEvent, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
@@ -55,16 +55,34 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [submitSuccess, setSubmitSuccess] = useState(false);
 
-    const handleChange = (field: keyof JobCreateRequest) =>
-        (e: React.ChangeEvent<HTMLInputElement>) => {
+    type TextFieldName = Exclude<keyof JobCreateRequest, 'status'>;
+
+    const clearFieldError = (field: keyof JobCreateRequest) => {
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+        setSubmitError(null);
+        setSubmitSuccess(false);
+    };
+
+    const handleTextChange = (field: TextFieldName) =>
+        (e: ChangeEvent<HTMLInputElement>) => {
             setForm((prev) => ({ ...prev, [field]: e.target.value }));
-            setErrors((prev) => ({ ...prev, [field]: undefined }));
-            setSubmitError(null);
-            setSubmitSuccess(false);
+            clearFieldError(field);
         };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleStatusChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value as JobStatus;
+        setForm((prev) => ({ ...prev, status: value }));
+        clearFieldError('status');
+    };
+
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+
+        if (!token) {
+            setSubmitError('You must be signed in to create a job.');
+            return;
+        }
+
         const validationErrors = validate(form);
         setErrors(validationErrors);
 
@@ -96,7 +114,7 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
                     <TextField
                         label="Title"
                         value={form.title}
-                        onChange={handleChange('title')}
+                        onChange={handleTextChange('title')}
                         error={Boolean(errors.title)}
                         helperText={errors.title}
                         required
@@ -106,7 +124,7 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
                     <TextField
                         label="Description"
                         value={form.description}
-                        onChange={handleChange('description')}
+                        onChange={handleTextChange('description')}
                         error={Boolean(errors.description)}
                         helperText={errors.description}
                         multiline
@@ -117,7 +135,7 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
                     <TextField
                         label="Company"
                         value={form.company}
-                        onChange={handleChange('company')}
+                        onChange={handleTextChange('company')}
                         error={Boolean(errors.company)}
                         helperText={errors.company}
                         fullWidth
@@ -126,7 +144,7 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
                     <TextField
                         label="Location"
                         value={form.location}
-                        onChange={handleChange('location')}
+                        onChange={handleTextChange('location')}
                         error={Boolean(errors.location)}
                         helperText={errors.location}
                         fullWidth
@@ -136,7 +154,7 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
                         select
                         label="Status"
                         value={form.status}
-                        onChange={handleChange('status')}
+                        onChange={handleStatusChange}
                         fullWidth
                         inputProps={{ 'aria-label': 'Job status' }}
                     >
@@ -161,7 +179,7 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
                     <Button
                         type="submit"
                         variant="contained"
-                        disabled={submitting}
+                        disabled={submitting || !token}
                         sx={{ alignSelf: 'flex-start' }}
                     >
                         {submitting ? (
