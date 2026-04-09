@@ -38,7 +38,7 @@ public class JobCreateRequest {
                 .description(description)
                 .company(company)
                 .location(location)
-                .status(status != null ? status : JobStatus.OPEN)
+                .status(status)
                 .build();
     }
 }

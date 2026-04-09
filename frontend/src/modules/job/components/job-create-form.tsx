@@ -77,6 +77,10 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        if (submitting) return;
+
+        setSubmitSuccess(false);
+        setSubmitError(null);
 
         if (!token) {
             setSubmitError('You must be signed in to create a job.');
@@ -89,7 +93,6 @@ export default function JobCreateForm({ token, onSuccess }: JobCreateFormProps) 
         if (Object.keys(validationErrors).length > 0) return;
 
         setSubmitting(true);
-        setSubmitError(null);
 
         try {
             await createJob(form, token);

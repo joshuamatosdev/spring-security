@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Builder
@@ -21,6 +22,7 @@ public class JobResponse {
     private final LocalDateTime updatedAt;
 
     public static JobResponse from(Job job) {
+        Objects.requireNonNull(job, "job must not be null");
         return JobResponse.builder()
                 .id(job.getId())
                 .title(job.getTitle())
