@@ -13,8 +13,6 @@ on:
     types: [created]
   issues:
     types: [opened, assigned]
-  pull_request:
-    types: [opened, synchronize]
 
 jobs:
   claude:
@@ -35,29 +33,3 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: "@claude"
-
-  # Auto-review on new PRs and pushes to PRs
-  claude-review:
-    if: |
-      github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Claude PR Review
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            Review this pull request for code quality, correctness, and security.
-            Analyze the diff, then post your findings as review comments.
-            Focus on:
-            - Potential bugs or logic errors
-            - Security vulnerabilities
-            - SOLID principles violations
-            - Spring Boot best practices
-          claude_args: "--max-turns 5"
